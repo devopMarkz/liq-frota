@@ -1,5 +1,6 @@
 <template>
   <div class="trips-container">
+    <!-- Header redesenhado com tema escuro e ícones SVG -->
     <div class="header">
       <h1>Minhas Viagens</h1>
       <div class="header-actions">
@@ -17,42 +18,67 @@
     </div>
     
     <div class="container">
+      <!-- Adicionando funcionalidade de acordeão nos filtros -->
       <div class="filters-card">
-        <div class="filters-grid">
-          <div class="form-group">
-            <label class="form-label">
-              <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5S14.5 7.62 14.5 9S13.38 11.5 12 11.5Z" fill="currentColor"/>
-              </svg>
-              Origem
-            </label>
-            <input
-              v-model="filters.origem"
-              type="text"
-              class="form-input"
-              placeholder="Ex: São Paulo, SP"
-              @input="debouncedSearch"
-            />
+        <div class="filters-header" @click="toggleFilters">
+          <div class="filters-title">
+            <svg class="filters-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M10 18H14V16H10V18ZM3 6V8H21V6H3ZM6 13H18V11H6V13Z" fill="currentColor"/>
+            </svg>
+            Filtros de Busca
           </div>
-          
-          <div class="form-group">
-            <label class="form-label">
-              <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5S14.5 7.62 14.5 9S13.38 11.5 12 11.5Z" fill="currentColor"/>
-              </svg>
-              Destino
-            </label>
-            <input
-              v-model="filters.destino"
-              type="text"
-              class="form-input"
-              placeholder="Ex: Rio de Janeiro, RJ"
-              @input="debouncedSearch"
-            />
-          </div>
+          <svg 
+            class="toggle-arrow" 
+            :class="{ 'expanded': filtersExpanded }"
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none"
+          >
+            <path d="M7.41 8.59L12 13.17L16.59 8.59L18 10L12 16L6 10L7.41 8.59Z" fill="currentColor"/>
+          </svg>
         </div>
+        
+        <transition name="accordion">
+          <div v-show="filtersExpanded" class="filters-content">
+            <div class="filters-grid">
+              <div class="form-group">
+                <label class="form-label">
+                  <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5S14.5 7.62 14.5 9S13.38 11.5 12 11.5Z" fill="currentColor"/>
+                  </svg>
+                  Origem
+                </label>
+                <input
+                  v-model="filters.origem"
+                  type="text"
+                  class="form-input"
+                  placeholder="Ex: São Paulo, SP"
+                  @input="debouncedSearch"
+                />
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">
+                  <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5S14.5 7.62 14.5 9S13.38 11.5 12 11.5Z" fill="currentColor"/>
+                  </svg>
+                  Destino
+                </label>
+                <input
+                  v-model="filters.destino"
+                  type="text"
+                  class="form-input"
+                  placeholder="Ex: Rio de Janeiro, RJ"
+                  @input="debouncedSearch"
+                />
+              </div>
+            </div>
+          </div>
+        </transition>
       </div>
       
+      <!-- Botão Nova Viagem redesenhado -->
       <div class="actions">
         <router-link to="/trips/new" class="btn-primary">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -62,6 +88,7 @@
         </router-link>
       </div>
       
+      <!-- Estados de loading e vazio redesenhados -->
       <div v-if="loading" class="loading-state">
         <div class="loading-spinner">
           <svg width="24" height="24" viewBox="0 0 24 24">
@@ -88,6 +115,7 @@
         </router-link>
       </div>
       
+      <!-- Cards de viagem redesenhados com tema escuro -->
       <div v-else class="trips-list">
         <div v-for="trip in trips" :key="trip.id" class="trip-card">
           <div class="trip-header">
@@ -155,6 +183,7 @@
         </div>
       </div>
       
+      <!-- Paginação redesenhada -->
       <div v-if="pagination.totalPages > 1" class="pagination">
         <button 
           @click="changePage(pagination.number - 1)"
@@ -162,7 +191,7 @@
           class="pagination-btn"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" fill="currentColor"/>
+            <path d="M7.41 8.59L12 13.17L16.59 8.59L18 10L12 16L6 10L7.41 8.59Z" fill="currentColor"/>
           </svg>
           Anterior
         </button>
@@ -205,16 +234,34 @@ export default {
         first: true,
         last: true
       },
-      searchTimeout: null
+      searchTimeout: null,
+      filtersExpanded: true
     }
   },
   mounted() {
     this.loadTrips()
+    this.checkMobileView()
+    window.addEventListener('resize', this.checkMobileView)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkMobileView)
   },
   methods: {
     formatCurrency,
     formatNumber,
     formatDate,
+    
+    toggleFilters() {
+      this.filtersExpanded = !this.filtersExpanded
+    },
+    
+    checkMobileView() {
+      if (window.innerWidth <= 768) {
+        this.filtersExpanded = false
+      } else {
+        this.filtersExpanded = true
+      }
+    },
     
     async loadTrips() {
       this.loading = true
@@ -366,8 +413,50 @@ export default {
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 12px;
-  padding: 20px;
   margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* Estilos para o cabeçalho do acordeão de filtros */
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.filters-header:hover {
+  background: #1f1f1f;
+}
+
+.filters-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.filters-icon {
+  color: #8b5cf6;
+}
+
+.toggle-arrow {
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.toggle-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+/* Container para o conteúdo dos filtros */
+.filters-content {
+  padding: 0 20px 20px 20px;
 }
 
 .filters-grid {
@@ -382,43 +471,20 @@ export default {
   }
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
+/* Animações para o acordeão */
+.accordion-enter-active, .accordion-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.form-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #e5e7eb;
-  font-size: 14px;
+.accordion-enter, .accordion-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 
-.input-icon {
-  margin-right: 8px;
-  color: #9ca3af;
-}
-
-.form-input {
-  padding: 12px;
-  background: #111111;
-  border: 1px solid #2a2a2a;
-  border-radius: 8px;
-  font-size: 16px;
-  color: #ffffff;
-  transition: all 0.2s ease;
-}
-
-.form-input::placeholder {
-  color: #6b7280;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+.accordion-enter-to, .accordion-leave {
+  max-height: 200px;
+  opacity: 1;
 }
 
 .actions {
@@ -613,5 +679,51 @@ export default {
 .pagination-info {
   color: #9ca3af;
   font-size: 14px;
+}
+
+/* Adicionando estilos para os campos de filtro com tema escuro */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+.input-icon {
+  color: #8b5cf6;
+  flex-shrink: 0;
+}
+
+.form-input {
+  background: #111111;
+  border: 1px solid #374151;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.form-input::placeholder {
+  color: #6b7280;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.form-input:hover {
+  border-color: #4b5563;
 }
 </style>
