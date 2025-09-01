@@ -1,5 +1,6 @@
 <template>
   <div class="trip-form-container">
+    <!-- Redesenhado header com tema escuro e ícones -->
     <div class="header">
       <button @click="$router.go(-1)" class="back-button">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -11,6 +12,7 @@
     </div>
     
     <div class="container">
+      <!-- Tabs redesenhadas com tema escuro -->
       <div v-if="!isEdit" class="tabs">
         <button 
           class="tab" 
@@ -37,6 +39,7 @@
       <!-- Modo Individual -->
       <div v-if="isEdit || mode === 'individual'" class="individual-form">
         <div class="form-card">
+          <!-- Adicionando funcionalidade de acordeão no formulário individual -->
           <div class="accordion-header" @click="toggleIndividualForm">
             <div class="accordion-title">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -58,12 +61,13 @@
           
           <transition name="accordion">
             <div v-show="individualFormExpanded" class="accordion-content">
+              <!-- Usando TripFormFields ao invés de FreteForm -->
               <TripFormFields 
                 v-model="individualForm"
                 :errors="formErrors"
               />
               
-              <!-- Botão de recálculo redesenhado
+              <!-- Botão de recálculo redesenhado -->
               <div v-if="isEdit" class="edit-actions">
                 <button @click="recalculate" class="action-button secondary" :disabled="loading">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -71,8 +75,9 @@
                   </svg>
                   Recalcular (Preview)
                 </button>
-              </div> -->
+              </div>
               
+              <!-- Botões de ação redesenhados -->
               <div class="form-actions">
                 <button @click="simulate" class="action-button primary" :disabled="loading">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -98,6 +103,7 @@
       
       <!-- Modo Lote -->
       <div v-if="!isEdit && mode === 'lote'" class="lote-form">
+        <!-- Header do lote redesenhado -->
         <div class="lote-header">
           <h3>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -107,12 +113,13 @@
           </h3>
           <button @click="addLoteItem" class="add-button">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 6H5H21M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6M19 6V20C19 20.5523 18.5523 21 18 21H6C5.44772 21 5 20.5523 5 20V6H19ZM10 11V17M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             Adicionar
           </button>
         </div>
         
+        <!-- Items do lote redesenhados com acordeão -->
         <div v-for="(item, index) in loteItems" :key="index" class="lote-item">
           <div class="lote-item-header" @click="toggleLoteItem(index)">
             <span class="lote-item-title">
@@ -141,6 +148,7 @@
             </div>
           </div>
           
+          <!-- Adicionado transição e controle de visibilidade para acordeão -->
           <transition name="accordion">
             <div v-show="expandedLoteItems[index]" class="lote-item-content">
               <TripFormFields 
@@ -185,6 +193,7 @@
         </div>
         
         <div v-if="!isEdit && mode === 'lote'" class="lote-result">
+          <!-- Implementado acordeão para resultados das viagens -->
           <div v-for="(item, index) in simulationResult.itens" :key="index" class="result-item">
             <div class="result-item-header" @click="toggleResultItem(index)">
               <h4 class="result-item-title">Viagem {{ index + 1 }}</h4>
@@ -293,7 +302,9 @@ export default {
         precoLitro: '',
         gastosAdicionais: '',
         valorFrete: '',
-        idaEVolta: false
+        ganhoPorKmDesejado: '', // Corrigido nome do campo para coincidir com TripFormFields
+        idaEVolta: false,
+        modo: 'frete' // Corrigido nome do campo para coincidir com TripFormFields
       },
       
       loteItems: [],
@@ -328,11 +339,11 @@ export default {
     validateForm(form) {
       const errors = {}
       
-      if (!form.origem?.trim()) {
+      if (!form.origem || form.origem.trim() === '') {
         errors.origem = 'Origem é obrigatória'
       }
       
-      if (!form.destino?.trim()) {
+      if (!form.destino || form.destino.trim() === '') {
         errors.destino = 'Destino é obrigatório'
       }
       
@@ -352,8 +363,14 @@ export default {
         errors.gastosAdicionais = 'Gastos adicionais não podem ser negativos'
       }
       
-      if (!form.valorFrete || parseNumber(form.valorFrete) <= 0) {
-        errors.valorFrete = 'Valor do frete deve ser maior que 0'
+      if (form.modo === 'frete') {
+        if (!form.valorFrete || parseNumber(form.valorFrete) <= 0) {
+          errors.valorFrete = 'Valor do frete deve ser maior que 0'
+        }
+      } else if (form.modo === 'ganho') {
+        if (!form.ganhoPorKmDesejado || parseNumber(form.ganhoPorKmDesejado) <= 0) {
+          errors.ganhoPorKmDesejado = 'Ganho por km deve ser maior que 0'
+        }
       }
       
       return errors
@@ -390,8 +407,10 @@ export default {
           consumoKmPorLitro: trip.consumoKmPorLitro.toString().replace('.', ','),
           precoLitro: trip.precoLitro.toString().replace('.', ','),
           gastosAdicionais: trip.gastosAdicionais.toString().replace('.', ','),
-          valorFrete: trip.valorFrete.toString().replace('.', ','),
-          idaEVolta: trip.idaEVolta
+          valorFrete: trip.valorFrete ? trip.valorFrete.toString().replace('.', ',') : '',
+          ganhoPorKmDesejado: trip.ganhoPorKmDesejado ? trip.ganhoPorKmDesejado.toString().replace('.', ',') : '', // Corrigido nome do campo
+          idaEVolta: trip.idaEVolta,
+          modo: trip.modo || 'frete' // Corrigido nome do campo
         }
       } catch (error) {
         this.showErrorModal('Erro ao carregar viagem: ' + error.message)
@@ -408,7 +427,9 @@ export default {
         precoLitro: '',
         gastosAdicionais: '',
         valorFrete: '',
-        idaEVolta: false
+        ganhoPorKmDesejado: '', // Corrigido nome do campo
+        idaEVolta: false,
+        modo: 'frete' // Corrigido nome do campo
       })
       this.$set(this.expandedLoteItems, index, true)
     },
@@ -580,16 +601,24 @@ export default {
     },
     
     prepareFormData(form) {
-      return {
+      const baseData = {
         origem: form.origem,
         destino: form.destino,
         distanciaKm: parseNumber(form.distanciaKm),
         consumoKmPorLitro: parseNumber(form.consumoKmPorLitro),
         precoLitro: parseNumber(form.precoLitro),
         gastosAdicionais: parseNumber(form.gastosAdicionais),
-        valorFrete: parseNumber(form.valorFrete),
         idaEVolta: form.idaEVolta
       }
+      
+      // Adicionar campo de preço baseado no modo escolhido usando nome correto do campo
+      if (form.modo === 'frete') {
+        baseData.valorFrete = parseNumber(form.valorFrete)
+      } else if (form.modo === 'ganho') {
+        baseData.ganhoPorKmDesejado = parseNumber(form.ganhoPorKmDesejado)
+      }
+      
+      return baseData
     },
     
     toggleIndividualForm() {

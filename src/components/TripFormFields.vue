@@ -56,7 +56,7 @@
           placeholder="Ex.: 430,00"
           class="form-input"
           :class="{ error: errors.distanciaKm }"
-          @input="updateValue"
+          @input="handleNumericInput('distanciaKm', $event)"
         />
         <span v-if="errors.distanciaKm" class="error-text">{{ errors.distanciaKm }}</span>
       </div>
@@ -77,7 +77,7 @@
           placeholder="Ex.: 12,5"
           class="form-input"
           :class="{ error: errors.consumoKmPorLitro }"
-          @input="updateValue"
+          @input="handleNumericInput('consumoKmPorLitro', $event)"
         />
         <span v-if="errors.consumoKmPorLitro" class="error-text">{{ errors.consumoKmPorLitro }}</span>
       </div>
@@ -99,7 +99,7 @@
           placeholder="Ex.: 5,99"
           class="form-input"
           :class="{ error: errors.precoLitro }"
-          @input="updateValue"
+          @input="handleNumericInput('precoLitro', $event)"
         />
         <span v-if="errors.precoLitro" class="error-text">{{ errors.precoLitro }}</span>
       </div>
@@ -119,13 +119,46 @@
           placeholder="Ex.: 50,00"
           class="form-input"
           :class="{ error: errors.gastosAdicionais }"
-          @input="updateValue"
+          @input="handleNumericInput('gastosAdicionais', $event)"
         />
         <span v-if="errors.gastosAdicionais" class="error-text">{{ errors.gastosAdicionais }}</span>
       </div>
     </div>
     
     <div class="form-group">
+      <label class="pricing-mode-label">Como quer informar o preço?</label>
+      <div class="pricing-mode-toggle">
+        <label class="toggle-option" :class="{ active: localValue.modo === 'frete' }">
+          <input
+            type="radio"
+            value="frete"
+            v-model="localValue.modo"
+            @change="handleModeChange"
+            class="toggle-radio"
+          />
+          <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M11.8 10.9C9.53 10.31 8.8 9.7 8.8 8.75C8.8 7.66 9.81 6.9 11.5 6.9C13.28 6.9 13.94 7.75 14 9H16.21C16.14 7.28 15.09 5.7 13 5.19V3H10V5.16C8.06 5.58 6.5 6.84 6.5 8.77C6.5 11.08 8.41 12.23 11.2 12.9C13.7 13.5 14.2 14.38 14.2 15.31C14.2 16 13.71 17.1 11.5 17.1C9.44 17.1 8.63 16.18 8.5 15H6.32C6.44 17.19 8.08 18.42 10 18.83V21H13V18.85C14.95 18.5 16.5 17.35 16.5 15.3C16.5 12.46 14.07 11.5 11.8 10.9Z" fill="currentColor"/>
+          </svg>
+          <span>Valor do frete (R$)</span>
+        </label>
+        
+        <label class="toggle-option" :class="{ active: localValue.modo === 'ganho' }">
+          <input
+            type="radio"
+            value="ganho"
+            v-model="localValue.modo"
+            @change="handleModeChange"
+            class="toggle-radio"
+          />
+          <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M16 6L18.29 8.29L13.41 13.17L9.41 9.17L2 16.59L3.41 18L9.41 12L13.41 16L19.71 9.71L22 12V6H16Z" fill="currentColor"/>
+          </svg>
+          <span>Ganho por km (R$/km)</span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="form-group" v-if="localValue.modo === 'frete'">
       <label for="valor">
         <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
           <path d="M11.8 10.9C9.53 10.31 8.8 9.7 8.8 8.75C8.8 7.66 9.81 6.9 11.5 6.9C13.28 6.9 13.94 7.75 14 9H16.21C16.14 7.28 15.09 5.7 13 5.19V3H10V5.16C8.06 5.58 6.5 6.84 6.5 8.77C6.5 11.08 8.41 12.23 11.2 12.9C13.7 13.5 14.2 14.38 14.2 15.31C14.2 16 13.71 17.1 11.5 17.1C9.44 17.1 8.63 16.18 8.5 15H6.32C6.44 17.19 8.08 18.42 10 18.83V21H13V18.85C14.95 18.5 16.5 17.35 16.5 15.3C16.5 12.46 14.07 11.5 11.8 10.9Z" fill="currentColor"/>
@@ -140,9 +173,29 @@
         placeholder="Ex.: 900,00"
         class="form-input"
         :class="{ error: errors.valorFrete }"
-        @input="updateValue"
+        @input="handleNumericInput('valorFrete', $event)"
       />
       <span v-if="errors.valorFrete" class="error-text">{{ errors.valorFrete }}</span>
+    </div>
+    
+    <div class="form-group" v-if="localValue.modo === 'ganho'">
+      <label for="ganho">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M16 6L18.29 8.29L13.41 13.17L9.41 9.17L2 16.59L3.41 18L9.41 12L13.41 16L19.71 9.71L22 12V6H16Z" fill="currentColor"/>
+          </svg>
+        Ganho por km (R$/km) *
+      </label>
+      <input
+        id="ganho"
+        v-model="localValue.ganhoPorKmDesejado"
+        type="text"
+        inputmode="decimal"
+        placeholder="Ex.: 1,20"
+        class="form-input"
+        :class="{ error: errors.ganhoPorKmDesejado }"
+        @input="handleNumericInput('ganhoPorKmDesejado', $event)"
+      />
+      <span v-if="errors.ganhoPorKmDesejado" class="error-text">{{ errors.ganhoPorKmDesejado }}</span>
     </div>
     
     <div class="form-group checkbox-group">
@@ -177,18 +230,41 @@ export default {
   },
   data() {
     return {
-      localValue: { ...this.value }
+      localValue: { 
+        ...this.value,
+        modo: this.value.modo || 'frete'
+      }
     }
   },
   watch: {
     value: {
       handler(newValue) {
-        this.localValue = { ...newValue }
+        this.localValue = { 
+          ...newValue,
+          modo: newValue.modo || 'frete'
+        }
       },
       deep: true
     }
   },
   methods: {
+    handleNumericInput(field, event) {
+      const value = event.target.value
+      const numericValue = value.replace(/[^0-9.,]/g, '')
+      this.localValue[field] = numericValue
+      event.target.value = numericValue
+      this.updateValue()
+    },
+    
+    handleModeChange() {
+      if (this.localValue.modo === 'frete') {
+        this.localValue.ganhoPorKmDesejado = ''
+      } else {
+        this.localValue.valorFrete = ''
+      }
+      this.updateValue()
+    },
+    
     updateValue() {
       this.$emit('input', { ...this.localValue })
     }
@@ -228,7 +304,6 @@ export default {
   color: #9ca3af;
 }
 
-/* Aplicando estilo escuro nos inputs conforme solicitado */
 .form-input {
   background: #111111;
   border: 1px solid #374151;
@@ -285,9 +360,75 @@ export default {
   font-weight: 500;
 }
 
+.pricing-mode-label {
+  color: #d1d5db;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.pricing-mode-toggle {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.toggle-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #111111;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0;
+}
+
+.toggle-option:hover {
+  border-color: #4b5563;
+  background: #1f1f1f;
+}
+
+.toggle-option.active {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.toggle-radio {
+  display: none;
+}
+
+.toggle-icon {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.toggle-option.active .toggle-icon {
+  color: #8b5cf6;
+}
+
+.toggle-option span {
+  color: #d1d5db;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.toggle-option.active span {
+  color: #ffffff;
+}
+
 @media (max-width: 480px) {
   .form-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .pricing-mode-toggle {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 </style>
