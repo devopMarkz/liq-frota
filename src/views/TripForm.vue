@@ -68,14 +68,14 @@
               />
               
               <!-- Botão de recálculo redesenhado -->
-              <div v-if="isEdit" class="edit-actions">
+              <!--<div v-if="isEdit" class="edit-actions">
                 <button @click="recalculate" class="action-button secondary" :disabled="loading">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path d="M1 4V10H7M23 20V14H17M20.49 9C19.9828 7.56678 19.1209 6.28392 17.9845 5.27493C16.8482 4.26595 15.4745 3.56905 13.9917 3.24575C12.5089 2.92246 10.9652 2.98546 9.51691 3.42597C8.06861 3.86648 6.76071 4.66897 5.71 5.75L1 10M23 14L18.29 18.25C17.2393 19.331 15.9314 20.1335 14.4831 20.574C13.0348 21.0145 11.4911 21.0775 10.0083 20.7542C8.52547 20.431 7.1518 19.734 6.01547 18.7251C4.87913 17.7161 4.01717 16.4332 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   Recalcular (Preview)
                 </button>
-              </div>
+              </div>-->
               
               <!-- Botões de ação redesenhados -->
               <div class="form-actions">
@@ -304,7 +304,8 @@ export default {
         valorFrete: '',
         ganhoPorKmDesejado: '', // Corrigido nome do campo para coincidir com TripFormFields
         idaEVolta: false,
-        modo: 'frete' // Corrigido nome do campo para coincidir com TripFormFields
+        modo: 'frete', // Corrigido nome do campo para coincidir com TripFormFields
+        aplicarBonus40: false // Adicionando campo aplicarBonus40 no payload
       },
       
       loteItems: [],
@@ -410,7 +411,8 @@ export default {
           valorFrete: trip.valorFrete ? trip.valorFrete.toString().replace('.', ',') : '',
           ganhoPorKmDesejado: trip.ganhoPorKmDesejado ? trip.ganhoPorKmDesejado.toString().replace('.', ',') : '', // Corrigido nome do campo
           idaEVolta: trip.idaEVolta,
-          modo: trip.modo || 'frete' // Corrigido nome do campo
+          modo: trip.modo || 'frete', // Corrigido nome do campo
+          aplicarBonus40: trip.aplicarBonus40 || false // Adicionando campo aplicarBonus40 no payload
         }
       } catch (error) {
         this.showErrorModal('Erro ao carregar viagem: ' + error.message)
@@ -429,7 +431,8 @@ export default {
         valorFrete: '',
         ganhoPorKmDesejado: '', // Corrigido nome do campo
         idaEVolta: false,
-        modo: 'frete' // Corrigido nome do campo
+        modo: 'frete', // Corrigido nome do campo
+        aplicarBonus40: false // Adicionando campo aplicarBonus40 no payload
       })
       this.$set(this.expandedLoteItems, index, true)
     },
@@ -608,7 +611,8 @@ export default {
         consumoKmPorLitro: parseNumber(form.consumoKmPorLitro),
         precoLitro: parseNumber(form.precoLitro),
         gastosAdicionais: parseNumber(form.gastosAdicionais),
-        idaEVolta: form.idaEVolta
+        idaEVolta: form.idaEVolta,
+        aplicarBonus40: form.aplicarBonus40 || false // Adicionando campo aplicarBonus40 no payload
       }
       
       // Adicionar campo de preço baseado no modo escolhido usando nome correto do campo

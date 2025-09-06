@@ -27,11 +27,14 @@
           <span class="destination">{{ result.destino }}</span>
         </div>
       </div>
-      <div class="round-trip" v-if="result.idaEVolta">
-        <svg class="badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z" fill="currentColor"/>
-        </svg>
-        <span class="badge">Ida e Volta</span>
+      
+      <div class="route-details">
+        <div class="round-trip" v-if="result.idaEVolta">
+          <svg class="badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z" fill="currentColor"/>
+          </svg>
+          <span class="badge">Ida e Volta</span>
+        </div>
       </div>
     </div>
     
@@ -44,6 +47,16 @@
           <span class="label">Distância Considerada</span>
         </div>
         <span class="value">{{ formatNumber(result.distanciaConsideradaKm) }} km</span>
+      </div>
+      
+      <div class="metric" v-if="result.duracaoFormatada">
+        <div class="metric-header">
+          <svg class="metric-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22S22 17.52 22 12S17.52 2 12 2ZM13 7H11V12.41L15.29 16.71L16.71 15.29L13 11.59V7Z" fill="currentColor"/>
+          </svg>
+          <span class="label">Duração da Viagem</span>
+        </div>
+        <span class="value">{{ result.duracaoFormatada }}</span>
       </div>
       
       <div class="metric cost">
@@ -203,6 +216,13 @@ export default {
   color: #8b5cf6;
 }
 
+.route-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .round-trip {
   display: flex;
   align-items: center;
@@ -226,11 +246,6 @@ export default {
   height: 14px;
 }
 
-.metrics-grid {
-  display: grid;
-  gap: 12px;
-}
-
 .metric {
   display: flex;
   justify-content: space-between;
@@ -240,6 +255,7 @@ export default {
   border: 1px solid #2a2a2a;
   border-radius: 12px;
   transition: all 0.2s ease;
+  margin-bottom: 5px;
 }
 
 .metric:hover {
@@ -305,18 +321,26 @@ export default {
 }
 
 @media (max-width: 480px) {
-  .route {
+  .simulation-card {
+    padding: 16px;
+  }
+  
+  .metrics-grid {
+    gap: 8px;
+  }
+  
+  .metric {
+    padding: 12px;
+  }
+  
+  .metric .value {
+    font-size: 14px;
+  }
+  
+  .route-details {
     flex-direction: column;
-    gap: 12px;
-  }
-  
-  .arrow-container {
-    margin: 0;
-    transform: rotate(90deg);
-  }
-  
-  .location {
-    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 </style>

@@ -212,6 +212,21 @@
         <span class="checkbox-text">Ida e Volta</span>
       </label>
     </div>
+
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label">
+        <input
+          v-model="localValue.aplicarBonus40"
+          type="checkbox"
+          class="form-checkbox"
+          @change="updateValue"
+        />
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22S22 17.52 22 12S17.52 2 12 2ZM15.5 9L16.5 7.5L19 10L16.5 12.5L15.5 11L17 9.5L15.5 9ZM9.5 9L8.5 7.5L6 10L8.5 12.5L9.5 11L8 9.5L9.5 9ZM11 17H13V15H11V17Z" fill="currentColor"/>
+        </svg>
+        <span class="checkbox-text">Aplicar 40% no valor líquido</span>
+      </label>
+    </div>
   </div>
 </template>
 
@@ -232,7 +247,8 @@ export default {
     return {
       localValue: { 
         ...this.value,
-        modo: this.value.modo || 'frete'
+        modo: this.value.modo || 'frete',
+        aplicarBonus40: this.value.aplicarBonus40 || false
       }
     }
   },
@@ -241,7 +257,8 @@ export default {
       handler(newValue) {
         this.localValue = { 
           ...newValue,
-          modo: newValue.modo || 'frete'
+          modo: newValue.modo || 'frete',
+          aplicarBonus40: newValue.aplicarBonus40 || false
         }
       },
       deep: true
